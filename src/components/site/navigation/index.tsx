@@ -1,4 +1,4 @@
-import { ModeToggle } from "@/components/glopal/mode-toggle";
+import { ModeToggle } from "@/components/global/mode-toggle";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";

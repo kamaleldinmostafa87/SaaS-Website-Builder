@@ -1,11 +1,55 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 // const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)'])
-const isPublicRoute = createRouteMatcher(["site", "/api/uploadthing"]);
+const isPublicRoute = createRouteMatcher(["/site", "/api/uploadthing"]);
 
 export default clerkMiddleware((auth, req) => {
-  if (!isPublicRoute(req)) {
-    auth().protect();
+  if (isPublicRoute(req)) {
+    req.nextUrl;
+  }
+  //rewrite for domains
+  const url = req.nextUrl; //baseurl
+  console.log("url", url);
+
+  const searchParams = url.searchParams.toString(); //id=2
+  let hostname = req.headers;
+  console.log("pathname", url.pathname);
+
+  const pathWithSearchPrams = `${url.pathname}${
+    searchParams.length > 0 ? `${searchParams}` : ""
+  }`;
+
+  // if subdomain exist
+  // subdomain.localhost
+  const customSubDomain = hostname
+    .get("host")
+    ?.split(`${process.env.NEXT_PUBLIC_DOMAIN}`)
+    .filter(Boolean)[0];
+
+  if (customSubDomain) {
+    return NextResponse.rewrite(
+      new URL(`/${customSubDomain}${pathWithSearchPrams}`, req.url)
+    );
+  }
+
+  if (url.pathname === "/sign-in" || url.pathname === "/sign-up") {
+    return NextResponse.redirect(new URL(`/agency/sign-in`, req.url));
+  }
+
+  // i don't know why host written // /  /site    /subdomain.localhost.com/site
+  if (
+    url.pathname === "/" ||
+    (url.pathname === "/site" && url.host === process.env.NEXT_PUBLIC_DOMAIN)
+  ) {
+    return NextResponse.redirect(new URL(`/site`, req.url));
+  }
+
+  if (
+    url.pathname.startsWith("/agency") ||
+    url.pathname.startsWith("/subaccount")
+  ) {
+    return NextResponse.redirect(new URL(`${pathWithSearchPrams}`, req.url));
   }
 });
 //
