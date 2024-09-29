@@ -25,7 +25,10 @@ export default clerkMiddleware((auth, req) => {
   const customSubDomain = hostname
     .get("host")
     ?.split(`${process.env.NEXT_PUBLIC_DOMAIN}`)
-    .filter(Boolean)[0];
+    .filter(Boolean)[0]; // undefined if not exist subdomain
+
+  console.log("domain", customSubDomain);
+  console.log("host", hostname.get("host"));
 
   if (customSubDomain) {
     return NextResponse.rewrite(
@@ -42,14 +45,15 @@ export default clerkMiddleware((auth, req) => {
     url.pathname === "/" ||
     (url.pathname === "/site" && url.host === process.env.NEXT_PUBLIC_DOMAIN)
   ) {
-    return NextResponse.redirect(new URL(`/site`, req.url));
+    //rewrite, show the route and not change it, //refirect, change the route to the redirected route
+    return NextResponse.rewrite(new URL(`/site`, req.url));
   }
 
   if (
     url.pathname.startsWith("/agency") ||
     url.pathname.startsWith("/subaccount")
   ) {
-    return NextResponse.redirect(new URL(`${pathWithSearchPrams}`, req.url));
+    return NextResponse.rewrite(new URL(`${pathWithSearchPrams}`, req.url));
   }
 });
 //

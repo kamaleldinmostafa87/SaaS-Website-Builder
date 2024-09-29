@@ -3,8 +3,13 @@ import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
+import { User } from "@clerk/nextjs/server";
 
-function Navigation() {
+type Props = {
+  user?: null | User;
+};
+
+function Navigation({ user }: Props) {
   return (
     <div className="relative flex items-center justify-between p-4">
       <aside className="flex items-center gap-2">
