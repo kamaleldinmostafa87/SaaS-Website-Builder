@@ -18,6 +18,8 @@ export const saveActivityLogNotification = async ({
   const authUser = await currentUser();
   let userData;
   if (!authUser) {
+    // find user based on subaccount id
+    // get user who has subaccount id
     const response = await db.user.findFirst({
       where: {
         Agency: {
@@ -27,6 +29,7 @@ export const saveActivityLogNotification = async ({
         },
       },
     });
+
     if (response) {
       userData = response;
     }
