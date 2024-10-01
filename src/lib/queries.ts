@@ -98,31 +98,39 @@ export const createTeamUser = async (params: string, user: User) => {
 
 export const verifyAndAcceptInvitation = async () => {
   const user = await currentUser();
+  console.log("userrrr", user?.firstName);
+  console.log("emial", user?.emailAddresses[0]?.emailAddress);
+
   if (!user) return redirect("/sign-in");
   const invitationExists = await db.invitation.findUnique({
     where: {
-      email: user.emailAddresses[0].emailAddress,
+      email: user?.emailAddresses[0]?.emailAddress,
       status: "PENDING",
     },
   });
+  if (!invitationExists) console.log("no invitation");
+  console.log("invitation", invitationExists);
+
   //object contains user's invitaion
   if (invitationExists) {
     const userDetails = await createTeamUser(invitationExists.agencyId, {
       email: invitationExists.email,
       agencyId: invitationExists.agencyId,
-      avatarUrl: user.imageUrl,
-      id: user.id,
-      name: `${user.firstName}  ${user.lastName}`,
+      avatarUrl: user?.imageUrl,
+      id: user?.id,
+      name: `${user?.firstName}  ${user?.lastName}`,
       role: invitationExists.role,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
-    await saveActivityLogNotification({
+    const res = await saveActivityLogNotification({
       agencyId: invitationExists.agencyId,
       description: `Joined`,
       subaccountId: undefined,
     });
+
+    console.log("res from save activity", res);
 
     if (userDetails) {
       await clerkClient.users.updateUserMetadata(user.id, {
