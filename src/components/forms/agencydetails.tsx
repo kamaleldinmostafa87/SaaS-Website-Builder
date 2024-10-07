@@ -15,7 +15,8 @@ import {
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
-import { FileUpload } from "../global/file-upload";
+import FileUpload from "../global/file-upload";
+import File from "../global/file-upload";
 
 type Props = {
   data?: Partial<Agency>;
@@ -31,11 +32,15 @@ const FormSchema = z.object({
   zipCode: z.string().min(1),
   state: z.string().min(1),
   country: z.string().min(1),
-  agencyLogo: z.string(),
+  agencyLogo: z.string().min(1),
 });
 function AgencyDetails({ data }: Props) {
+  const { toast } = useToast();
+  const router = useRouter();
+  const [deletingAgency, setDeletingAgency] = useState(false);
+
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: "onchange",
+    mode: "onChange",
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: data?.name,
@@ -50,11 +55,6 @@ function AgencyDetails({ data }: Props) {
       agencyLogo: data?.agencyLogo,
     },
   });
-
-  const { toast } = useToast();
-  const { router } = useRouter();
-
-  const [deletingAgency, setDeletingAgency] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -91,11 +91,12 @@ function AgencyDetails({ data }: Props) {
                   <FormItem>
                     <FormLabel>Agency Logo</FormLabel>
                     <FormControl>
-                      <FileUpload
-                        apiEndpoint="agencyLogo"
+                      {/* <FileUpload
+                        // apiEndpoint="agencyLogo"
                         onChange={field.onChange}
                         value={field.value}
-                      ></FileUpload>
+                      /> */}
+                      <FileUpload onChange={field.onChange} />
                     </FormControl>
                   </FormItem>
                 )}
