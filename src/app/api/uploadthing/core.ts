@@ -1,10 +1,10 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 
 const f = createUploadthing();
 
 const authenticateUser = () => {
-  const user = currentUser();
+  const user = auth();
   // If you throw, the user will not be able to upload
   if (!user) throw new Error("Unauthorized");
   // Whatever is returned here is accessible in onUploadComplete as `metadata`
@@ -14,7 +14,7 @@ const authenticateUser = () => {
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
   // Define as many FileRoutes as you like, each with a unique routeSlug
-  subaccountLogo: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+  subAccountLogo: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
     .middleware(authenticateUser)
     .onUploadComplete(() => {}),
   avatar: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })

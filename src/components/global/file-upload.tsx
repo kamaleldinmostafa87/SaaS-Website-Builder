@@ -3,15 +3,14 @@ import Image from "next/image";
 import React from "react";
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
-import { UploadDropzone } from "@/lib/uploadthings";
-import Error from "next/error";
+import { UploadDropZone } from "@/lib/uploadthings";
 type Props = {
-  apiEndpoint?: "agencyLogo" | "avatar" | "subaccountLogo";
+  apiEndpoint: "agencyLogo" | "avatar" | "subAccountLogo";
   onChange: (url?: string) => void;
-  value: string;
+  value?: string;
 };
 
-export const FileUpload = ({ onChange, value }: Props) => {
+export const FileUpload = ({ apiEndpoint, onChange, value }: Props) => {
   const type = value?.split(".").pop();
 
   if (value) {
@@ -48,14 +47,15 @@ export const FileUpload = ({ onChange, value }: Props) => {
   }
   return (
     <div className="w-full bg-muted/30">
-      <UploadDropzone
+      <UploadDropZone
         endpoint={apiEndpoint}
         onClientUploadComplete={(res) => {
           console.log(res?.[0].url);
         }}
-        onUploadError={(error: Error) => {
+        onUploadError={(error) => {
           console.log(error);
         }}
+        className="h-22"
       />
     </div>
   );
