@@ -2,18 +2,23 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 // const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)'])
-const isPublicRoute = createRouteMatcher(["/site", "/api/uploadthing"]);
-
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/site",
+  "/api/uploadthing",
+  "/agency/sign-in(.*)",
+  "/agency/sign-up(.*)",
+]);
 export default clerkMiddleware((auth, req) => {
-  if (isPublicRoute(req)) {
-    req.nextUrl;
+  if (!isPublicRoute(req)) {
+    auth().protect();
   }
   //rewrite for domains
   const url = req.nextUrl; //baseurl
   console.log("url", url);
 
   const searchParams = url.searchParams.toString(); //id=2
-  let hostname = req.headers;
+  const hostname = req.headers;
   console.log("pathname", url.pathname);
 
   const pathWithSearchPrams = `${url.pathname}${
@@ -25,7 +30,7 @@ export default clerkMiddleware((auth, req) => {
   const customSubDomain = hostname
     .get("host")
     ?.split(`${process.env.NEXT_PUBLIC_DOMAIN}`)
-    .filter(Boolean)[0]; // undefined if not exist subdomain
+    .filter(Boolean)[0]; // un defined if not exist subdomain
 
   console.log("domain", customSubDomain);
   console.log("host", hostname.get("host"));
